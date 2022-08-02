@@ -1,0 +1,42 @@
+Project:
+-----------------------------
+Project name             = SV-simulation
+Reference sequence	 = FASTA
+Replace ambiguous nts(N) =
+
+
+Structural variation:
+-----------------------------
+VCF input                =
+Foreign sequences        =
+
+Deletions                = 0
+Length (bp)              = 30-150000
+
+Insertions               = 0
+Length (bp)              = 30-100000
+
+Tandem duplications	 = 0
+Length (bp)              = 50-10000
+Copies                   = 1-20
+
+Inversions               = 0
+Length (bp)              = 150-1300000
+
+Complex substitutions    = 0
+Length (bp)              = 30-100000
+
+Inverted duplications    = 0
+Length (bp)              = 150-350000
+
+Heterozygosity           = 60%
+
+
+Long Read simulation:
+-----------------------------
+Sequencing depth         = 10
+Median length            = 25000
+Length range             = 500-150000
+Accuracy                 = 94%
+Error profile            = error_profile_ONT.txt
+
