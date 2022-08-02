@@ -38,5 +38,5 @@ Sequencing depth         = 10
 Median length            = 25000
 Length range             = 500-150000
 Accuracy                 = 94%
-Error profile            = error_profile_ONT.txt
+Error profile            = error_profile.txt
 

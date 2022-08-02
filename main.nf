@@ -17,6 +17,8 @@
 
 params.help = null
 params.input_folder = null
+params.input_folder = null
+params.reference_genome = null
 params.output_folder = "SV-simulation_output"
 params.path_to_sim_it = "Sim-it/Sim-it1.3.2.pl"
 params.cpu = "8"
@@ -41,6 +43,7 @@ if (params.help) {
     log.info "Mandatory arguments:"
     log.info "--input_folder              FOLDER                 Input folder containing one normal genome fasta for each sample"
     log.info "--reference_genome          FILE                   Reference genome fasta file for minimap2 alignment"
+    log.info "--error_profile             FILE                   Error profile file, given by Sim-it"
     log.info ""
     log.info "Optional arguments:"
     log.info '--output_folder             FOLDER                 Output folder (default: SV-simulation_output)'
@@ -56,9 +59,11 @@ if (params.help) {
 
 assert (params.input_folder != null) : "please provide the --input_folder option"
 assert (params.reference_genome != null) : "please provide the --reference_genome option"
+assert (params.error_profile != null) : "please provide the --error_profile option"
 
 input_files = Channel.fromPath( params.input_folder+'/*gz' )
 ref = file(params.reference_genome)
+error_profile = file(params.error_profile)
 
 process sim_it {
   cpus params.cpu
@@ -69,6 +74,7 @@ process sim_it {
 
   input:
   file input_fasta from input_files
+  file error_profile
 
   output:
   file 'SV_simulation*.fasta.gz' into sv_fasta mode flatten
@@ -77,6 +83,8 @@ process sim_it {
   sample = input_fasta.baseName
   '''
   source ~/.profile
+
+  cp !{error_profile} error_profile.txt
 
   f=!{input_fasta}
   cp !{baseDir}/files/config_*.txt .
@@ -92,6 +100,8 @@ process sim_it {
 process minimap2 {
   cpus params.cpu
   memory params.mem+'GB'
+  errorStrategy { task.exitStatus == 143 ? 'retry' : 'terminate' }
+  maxRetries = 4
 
   publishDir params.output_folder+"/BAM/", mode: 'copy', pattern: "*bam*"
 
