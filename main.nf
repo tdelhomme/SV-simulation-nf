@@ -19,8 +19,8 @@ params.help = null
 params.input_folder = null
 params.output_folder = "SV-simulation_output"
 params.path_to_sim_it = "Sim-it/Sim-it1.3.2.pl"
-params.cpu = "2"
-params.mem = "20"
+params.cpu = "8"
+params.mem = "48"
 
 log.info ""
 log.info "-----------------------------------------------------------------------"
