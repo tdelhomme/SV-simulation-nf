@@ -58,7 +58,7 @@ input_files = Channel.fromPath( params.input_folder+'/*gz' )
 
 process sim_it {
 
-  publishDir params.output_folder+"/PVALS/", mode: 'copy', pattern: "*pvalue*"
+  publishDir params.output_folder+"/FASTA/", mode: 'copy', pattern: "SV_simulation*.fasta.gz"
 
   input:
   file input_fasta from input_files
@@ -68,11 +68,12 @@ process sim_it {
 
   shell:
   '''
-  $f=!{input_fasta}
-  sed "s/FASTA/$f/" !{baseDir}/files/config_g.txt
-  sed "s/FASTA/$f/" !{baseDir}/files/config_t.txt
-  perl !{params.path_to_sim_it} -c !{baseDir}/files/config_g.txt -o normal_reads
-  perl !{params.path_to_sim_it} -c !{baseDir}/files/config_t.txt -o tumor_reads
+  f=!{input_fasta}
+  cp !{baseDir}/files/config_*.txt .
+  sed -i "s/FASTA/$f/" config_g.txt
+  sed -i "s/FASTA/$f/" config_t.txt
+  perl !{params.path_to_sim_it} -c config_g.txt -o normal_reads
+  perl !{params.path_to_sim_it} -c config_t.txt -o tumor_reads
   mv normal_reads/SV_simulation.fasta SV_simulation_normal.fasta && gzip -c SV_simulation_normal.fasta > SV_simulation_normal.fasta.gz
   mv tumor_reads/SV_simulation.fasta SV_simulation_tumor.fasta && gzip -c SV_simulation_tumor.fasta > SV_simulation_tumor.fasta.gz
   '''
