@@ -58,7 +58,7 @@ assert (params.input_folder != null) : "please provide the --input_folder option
 assert (params.reference_genome != null) : "please provide the --reference_genome option"
 
 input_files = Channel.fromPath( params.input_folder+'/*gz' )
-
+ref = file(params.reference_genome)
 
 process sim_it {
   cpus params.cpu
@@ -71,13 +71,13 @@ process sim_it {
   file input_fasta from input_files
 
   output:
-  file 'SV_simulation*.fasta.gz' into skatpvalues
+  file 'SV_simulation*.fasta.gz' into sv_fasta mode flatten
 
   shell:
   sample = input_fasta.baseName
   '''
   source ~/.profile
-  
+
   f=!{input_fasta}
   cp !{baseDir}/files/config_*.txt .
   sed -i "s/FASTA/$f/" config_g.txt
@@ -86,5 +86,26 @@ process sim_it {
   perl !{params.path_to_sim_it} -c config_t.txt -o tumor_reads
   mv normal_reads/SV_simulation.fasta SV_simulation_normal.fasta && gzip -c SV_simulation_normal.fasta > SV_simulation_normal.fasta.gz
   mv tumor_reads/SV_simulation.fasta SV_simulation_tumor.fasta && gzip -c SV_simulation_tumor.fasta > SV_simulation_tumor.fasta.gz
+  '''
+}
+
+process minimap2 {
+  cpus params.cpu
+  memory params.mem+'GB'
+
+  publishDir params.output_folder+"/BAM/", mode: 'copy', pattern: "*bam*"
+
+  input:
+  file svf from sv_fasta
+  file ref
+
+  output:
+  file '*bam*' into sv_bam
+
+  shell:
+  tag = svf.baseName.replace(".fasta","")
+  '''
+  minimap2 -a -x map-ont !{ref} !{svf} > tmp
+  samtools view -S -b tmp > !{tag}.bam
   '''
 }
