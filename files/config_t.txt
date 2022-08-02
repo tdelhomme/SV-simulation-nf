@@ -1,6 +1,6 @@
 Project:
 -----------------------------
-Project name             = SV-simulation
+Project name             = SV_simulation
 Reference sequence	 = FASTA
 Replace ambiguous nts(N) =
 

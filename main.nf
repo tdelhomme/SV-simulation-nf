@@ -37,7 +37,7 @@ if (params.help) {
     log.info "nextflow run main.nf [OPTIONS]"
     log.info ""
     log.info "Mandatory arguments:"
-    log.info "--input_folder              FOLDER                 Input folder containing one germline genome fasta for each sample"
+    log.info "--input_folder              FOLDER                 Input folder containing one normal genome fasta for each sample"
     log.info "--reference_genome          FILE                   Reference genome fasta file for minimap2 alignment"
     log.info ""
     log.info "Optional arguments:"
@@ -51,6 +51,7 @@ if (params.help) {
 }
 
 assert (params.input_folder != null) : "please provide the --input_folder option"
+assert (params.reference_genome != null) : "please provide the --reference_genome option"
 
 input_files = Channel.fromPath( params.input_folder+'/*gz' )
 
@@ -63,14 +64,16 @@ process sim_it {
   file input_fasta from input_files
 
   output:
-  file '*pvalue' into skatpvalues
+  file 'SV_simulation*.fasta.gz' into skatpvalues
 
   shell:
   '''
   $f=!{input_fasta}
   sed "s/FASTA/$f/" !{baseDir}/files/config_g.txt
   sed "s/FASTA/$f/" !{baseDir}/files/config_t.txt
-  perl !{params.path_to_sim_it} -c !{baseDir}/files/config_g.txt -o germline_reads
+  perl !{params.path_to_sim_it} -c !{baseDir}/files/config_g.txt -o normal_reads
   perl !{params.path_to_sim_it} -c !{baseDir}/files/config_t.txt -o tumor_reads
+  mv normal_reads/SV_simulation.fasta SV_simulation_normal.fasta && gzip -c SV_simulation_normal.fasta > SV_simulation_normal.fasta.gz
+  mv tumor_reads/SV_simulation.fasta SV_simulation_tumor.fasta && gzip -c SV_simulation_tumor.fasta > SV_simulation_tumor.fasta.gz
   '''
 }
