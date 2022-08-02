@@ -19,6 +19,8 @@ params.help = null
 params.input_folder = null
 params.output_folder = "SV-simulation_output"
 params.path_to_sim_it = "Sim-it/Sim-it1.3.2.pl"
+params.cpu = "2"
+params.mem = "20"
 
 log.info ""
 log.info "-----------------------------------------------------------------------"
@@ -43,6 +45,8 @@ if (params.help) {
     log.info "Optional arguments:"
     log.info '--output_folder             FOLDER                 Output folder (default: SV-simulation_output)'
     log.info '--path_to_sim_it            PATH                   Path to sim-it perl script (default: Sim-it/Sim-it1.3.2.pl)'
+    log.info "--cpu                       INTEGER                Number of cpu to use (default: 2)"
+    log.info "--mem                       INTEGER                Memory in GB (default: 20)"
     log.info ""
     log.info "Flags:"
     log.info "--help                                             Display this message"
@@ -57,6 +61,9 @@ input_files = Channel.fromPath( params.input_folder+'/*gz' )
 
 
 process sim_it {
+  cpus params.cpu
+  memory params.mem+'GB'
+  tag {sample}
 
   publishDir params.output_folder+"/FASTA/", mode: 'copy', pattern: "SV_simulation*.fasta.gz"
 
@@ -67,6 +74,7 @@ process sim_it {
   file 'SV_simulation*.fasta.gz' into skatpvalues
 
   shell:
+  sample = input_fasta.baseName
   '''
   f=!{input_fasta}
   cp !{baseDir}/files/config_*.txt .
