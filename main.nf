@@ -76,6 +76,8 @@ process sim_it {
   shell:
   sample = input_fasta.baseName
   '''
+  source ~/.profile
+  
   f=!{input_fasta}
   cp !{baseDir}/files/config_*.txt .
   sed -i "s/FASTA/$f/" config_g.txt
