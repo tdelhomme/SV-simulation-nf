@@ -19,6 +19,7 @@ params.help = null
 params.input_folder = null
 params.input_folder = null
 params.reference_genome = null
+params.error_profile = null
 params.output_folder = "SV-simulation_output"
 params.path_to_sim_it = "Sim-it/Sim-it1.3.2.pl"
 params.cpu = "8"
